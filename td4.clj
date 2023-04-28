@@ -35,6 +35,8 @@
 
 (defn a-right [node]
   (:right node))
+(a-right (a-vide))
+(a-right (a-noeud 0 (a-vide) tree0))
 
 (defn a-print [A]
   (defn a-print-depth [A depth]
@@ -77,16 +79,7 @@
 
 (a-print-suf A)
 
-(a-print-inf A)
-;; '(1 2 3)
-;; (apply list [1 2 3])
-;; (conj [1 2 3] nil)
-;; (into [1 2 3] [4 5 6])
-;; (into [1 2 3] [])
-;; (conj '(1 2 3) nil)
-;; (reverse '(1 2 3))
-;; (reverse (conj (reverse '(1 2 3)) 4))
-
+;1234
 (defn parcours-prof [A]
   (defn parcours-list [A list]
     (cond
@@ -100,10 +93,10 @@
   (apply list (parcours-list A [])))
 
 (parcours-prof (a-vide))
-(parcours-prof tree0)                                                                              (a-vide))))
+(parcours-prof tree0)
 (parcours-prof A)
 
-
+;2314
 (defn parcours-prof-inf
   ([A] (apply list (parcours-prof-inf A [])))
   ([A list] (cond
@@ -111,40 +104,29 @@
               (and (a-vide? (:left A)) (a-vide? (:right A))) (conj list (:value A))
               (a-vide? (:left A)) (parcours-prof-inf (:right A) (conj list (:value A)))
               (a-vide? (:right A)) (parcours-prof-inf (:left A) (conj list (:value A)))
-              :else (into (parcours-prof-inf (:left A) []) (parcours-list (:right A) (conj list (:value A))))
+              :else (into (parcours-prof-inf (:left A) []) (parcours-prof-inf (:right A) (conj list (:value A))))
               )
   )
 )
 
-
 (parcours-prof-inf (a-vide))
-(parcours-prof-inf tree0)                                                                              
+(parcours-prof-inf tree0)
 (parcours-prof-inf A)
 
+;3241
 (defn parcours-prof-suf
   ([A] (apply list (parcours-prof-suf A [])))
-  ([A list] (cond
+  ([{:keys [value left right] :as A} mylist] (cond
               (a-vide? A) []
-              (and (a-vide? (:left A)) (a-vide? (:right A))) (conj list (:value A))
-              (a-vide? (:left A)) (parcours-prof-suf (:right A) (conj list (:value A)))
-              (a-vide? (:right A)) (parcours-prof-suf (:left A) (conj list (:value A)))
-              :else (into (parcours-prof-suf (:left A) []) (parcours-list (:right A) (conj list (:value A)))))))
-
+              (and (a-vide? left) (a-vide? right)) (conj mylist value)
+              (a-vide? left) (conj (parcours-prof-suf right mylist) value)
+              (a-vide? right) (conj (parcours-prof-suf left mylist) value)
+              :else (into (into (parcours-prof-suf left mylist) (parcours-prof-suf right)) [value])
+              )))
 
 (parcours-prof-suf (a-vide))
 (parcours-prof-suf tree0)
 (parcours-prof-suf A)
 
-;; (defn parcours-largeur
-;;   ([A] (apply list (parcours-prof-suf A [])))
-;;   ([A list] (cond
-;;               (a-vide? A) []
-;;               (and (a-vide? (:left A)) (a-vide? (:right A))) (conj list (:value A))
-;;               (a-vide? (:left A)) (parcours-largeur (:right A) (conj list (:value A)))
-;;               (a-vide? (:right A)) (parcours-largeur (:left A) (conj list (:value A)))
-;;               :else (into (parcours-largeur (:left A) []) (parcours-list (:right A) (conj list (:value A)))))))
-
-
-;; (parcours-largeur (a-vide))
-;; (parcours-largeur tree0)
-;; (parcours-largeur A)
+;1243
+;; (defn parcours-largeur)

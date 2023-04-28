@@ -75,3 +75,13 @@
       ret)))
 
 (time (fibo 35))
+
+
+'(1 2 3)
+(apply list [1 2 3])
+(conj [1 2 3] nil)
+(into [1 2 3] [4 5 6])
+(into [1 2 3] [])
+(conj '(1 2 3) nil)
+(reverse '(1 2 3))
+(reverse (conj (reverse '(1 2 3)) 4))
