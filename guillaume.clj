@@ -105,3 +105,12 @@
    (vector 1 0 2)
    (vector 1 1 2)))
 (winning-morpion? winner-morpion)
+
+(defn play-morpion []
+  (def plateau make-morpion)
+  (def player 1)
+  (while (false? (end-morpion? plateau))
+    (while (false? (winning-morpion? plateau))
+      (print-morpion plateau)
+      (move-morpion plateau player)
+      (exchange player))))
