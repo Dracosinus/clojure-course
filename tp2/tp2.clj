@@ -1,7 +1,7 @@
-(ns tp2
-  (:require [clj-time.core :as t]))
+(ns tp2)
 
-(t/now)
+(require '[clj-time.core :as t])
+;(t/date-time 1986)
 
 ;1
 (defrecord Book [titre auteur éditeur
@@ -13,10 +13,10 @@ date-de-publication isbn]
 date-de-publication isbn 1))
 
 (def hp1 (create-book "harry potter a l'école des sorciers" "JK Rowling"
-             "Gallimard jeunesse" "June 26, 1997" 2070584623))
+             "Gallimard jeunesse" (t/date-time 1997 06 26) 2070584623))
 (def hp2 (create-book "harry potter a l'école des sorciers" "JK Rowling"
-                      "Gallimard jeunesse" "July 2, 1998" 2070584623))
-(def cthulhu (create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" "February 1928" 2757851357))
+                      "Gallimard jeunesse" (t/date-time 1997 07 02) 2070584623))
+(def cthulhu (create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" (t/date-time 1928 02) 2757851357))
 
 (def test-book-list [hp1 cthulhu hp2])
 
@@ -25,4 +25,8 @@ date-de-publication isbn 1))
 
 (list-books-by-author test-book-list "JK Rowling")
 
-(defn sort-books-by-date [books date])
+(defn sort-books-by-date [books]
+  (sort-by :date-de-publication books)
+)
+
+(sort-books-by-date test-book-list)

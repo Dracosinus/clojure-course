@@ -22,7 +22,8 @@
 (pyra 3)
 (pyra 5)
 
-((pyra 3))
+;((pyra 3))
+
 
 ; ex 10
 (defn pyra2 [n]
@@ -89,8 +90,8 @@
 
 (defn chercher-personne [annuaire nom prenom]
   (def mykey  (str (str nom " ") prenom))
-  (if (contains? annuaire mykey) (get annuaire mykey)
-    (println (str mykey " not found in annuaire, can't return person")))
+  (if (contains? annuaire mykey) (get annuaire mykey) 
+      (println (str mykey " not found in annuaire, can't return person")))
   )
 
 (defn chercher-personne2 [annuaire personne]
@@ -144,5 +145,3 @@
 (:prenom depardieu)
 
 (def data {:apple "fruit" :banana "fruit" :carrot "vegetable" :apricot "fruit"})
-
-(keep #(if (= (first (name %)) \a) [% (data %)]) (keys data))
