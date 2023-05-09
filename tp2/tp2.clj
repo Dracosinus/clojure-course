@@ -30,3 +30,20 @@ date-de-publication isbn 1))
 )
 
 (sort-books-by-date test-book-list)
+
+(defn get-book-isbn [book] 
+  (:isbn book))
+
+(get-book-isbn cthulhu)
+
+(defn set-book-isbn [book isbn]
+  (assoc book :isbn isbn))
+
+(get-book-isbn (set-book-isbn cthulhu 1234))
+
+(defn print-book [book]
+  (print book))
+
+(print-book cthulhu)
+
+(defrecord Borrower [nom prenom addresse livres-empruntes])
