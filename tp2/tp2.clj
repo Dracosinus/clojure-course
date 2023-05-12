@@ -3,22 +3,27 @@
 (require '[clj-time.core :as t])
 ;(t/date-time 1986)
 
+(def bibliotheque (atom {}))
+(def emprunts (atom {}))
+
 ;1
 (defrecord Book [titre auteur éditeur
 date-de-publication isbn exemplaires-disponibles])
 
 (defn create-book [titre auteur éditeur
 date-de-publication isbn]
-  (->Book titre auteur éditeur
+  (swap! bibliotheque assoc isbn (->Book titre auteur éditeur
 date-de-publication isbn 1))
+)
 
 (def hp1 (create-book "harry potter a l'école des sorciers" "JK Rowling"
              "Gallimard jeunesse" (t/date-time 1997 06 26) 2070584623))
 (def hp2 (create-book "harry potter a l'école des sorciers" "JK Rowling"
-                      "Gallimard jeunesse" (t/date-time 1997 07 02) 2070584623))
+                      "Gallimard jeunesse" (t/date-time 1997 07 02) 2070584624))
 (def cthulhu (create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" (t/date-time 1928 02) 2757851357))
 
 (def test-book-list [hp1 cthulhu hp2])
+bibliotheque
 
 (defn list-books-by-author [books author]
   (filter #(= author (:auteur %)) books))
@@ -36,8 +41,10 @@ date-de-publication isbn 1))
 
 (get-book-isbn cthulhu)
 
-(defn set-book-isbn [book isbn]
-  (assoc book :isbn isbn))
+(defn set-book-isbn [book isbn] 
+  (swap! bibliotheque dissoc (:isbn book))
+  (swap! bibliotheque assoc isbn (assoc book :isbn isbn))
+  )
 
 (get-book-isbn (set-book-isbn cthulhu 1234))
 
@@ -46,4 +53,12 @@ date-de-publication isbn 1))
 
 (print-book cthulhu)
 
+
 (defrecord Borrower [nom prenom addresse livres-empruntes])
+
+(defn create-borrower[nom prenom addresse]
+  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse []))
+)
+
+(create-borrower "Benoit" "Schuler" "FAR")
+
