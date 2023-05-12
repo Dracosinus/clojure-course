@@ -17,10 +17,10 @@ date-de-publication isbn 1))
 )
 
 (create-book "harry potter a l'école des sorciers" "JK Rowling"
-             "Gallimard jeunesse" (t/date-time 1997 06 26) "2070584623")
+             "Gallimard jeunesse" (t/date-time 1997 06 26) 2070584623)
 (create-book "harry potter et la chambre des secrets" "JK Rowling"
-             "Gallimard jeunesse" (t/date-time 1997 07 02) "2070584624")
-(create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" (t/date-time 1928 02) "2757851357")
+             "Gallimard jeunesse" (t/date-time 1997 07 02) 2070584624)
+(create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" (t/date-time 1928 02) 2757851357)
 
 
 (defn list-books-by-author [author]
@@ -37,7 +37,7 @@ date-de-publication isbn 1))
 (defn get-book-isbn [book] 
   (:isbn book))
 
-(get-book-isbn (get @bibliotheque "2070584623"))
+(get-book-isbn (get @bibliotheque 2070584623))
 
 
 (defn set-book-isbn [book isbn] 
@@ -45,7 +45,7 @@ date-de-publication isbn 1))
   (swap! bibliotheque assoc isbn (assoc book :isbn isbn))
   )
 
-(get-book-isbn (set-book-isbn (get @bibliotheque "2070584623") 1234))
+(get-book-isbn (set-book-isbn (get @bibliotheque 2070584623) 1234))
 
 (defn print-book [book]
   (let [{titre :titre auteur :auteur editeur :editeur date-de-publication :date-de-publication isbn :isbn exemplaires-disponibles :exemplaires-disponibles} book]
@@ -58,8 +58,6 @@ date-de-publication isbn 1))
     )
 )
 
-(get @bibliotheque 1234)
-bibliotheque
 (print-book (get @bibliotheque 1234))
 
 (defrecord Borrower [nom prenom addresse livres-empruntes])
@@ -71,9 +69,9 @@ bibliotheque
 (create-borrower "Benoit" "Schuler" "FAR")
 
 (defn borrow-book [borrower-key isbn]
-  (if-let [target-book (find @bibliotheque isbn)]
+  (if-let [target-book (get @bibliotheque isbn)]
     (if (> (:exemplaires-disponibles target-book) 0) 
-      (if-let [borrower (find @emprunts borrower-key)]
+      (if-let [borrower (get @emprunts borrower-key)]
         (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- (:exemplaires-disponibles target-book) 1)))
             (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes target-book) target-book)))
         ) )
@@ -81,3 +79,6 @@ bibliotheque
     )
   )
 
+(borrow-book (hash (str "Benoit" "Schuler")) 1234)
+emprunts
+bibliotheque
