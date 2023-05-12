@@ -49,16 +49,18 @@ date-de-publication isbn 1))
 
 (defn print-book [book]
   (let [{titre :titre auteur :auteur editeur :editeur date-de-publication :date-de-publication isbn :isbn exemplaires-disponibles :exemplaires-disponibles} book]
-    (print titre)
-    (print auteur)
-    (print editeur)
-    (print date-de-publication)
-    (print isbn)
-    (print exemplaires-disponibles)
+    (println (str "Title is   " titre))
+    (println (str "Author is  " auteur))
+    (println (str "Editor is  " editeur))
+    (println (str "Printed on " (str (str "Year " (t/year date-de-publication)) (str (str ", Month "(t/month date-de-publication)) (str ", Day "  (t/day date-de-publication))))))
+    (println (str "With ISBN  " isbn))
+    (println (str "Availables " exemplaires-disponibles))
     )
 )
 
-(print-book (get @bibliotheque "2070584623"))
+(get @bibliotheque 1234)
+bibliotheque
+(print-book (get @bibliotheque 1234))
 
 (defrecord Borrower [nom prenom addresse livres-empruntes])
 
@@ -72,8 +74,8 @@ date-de-publication isbn 1))
   (if-let [target-book (find @bibliotheque isbn)]
     (if (> (:exemplaires-disponibles target-book) 0) 
       (if-let [borrower (find @emprunts borrower-key)]
-        (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- exemplaires-disponibles 1)))
-            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj livres-empruntes target-book)))
+        (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- (:exemplaires-disponibles target-book) 1)))
+            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes target-book) target-book)))
         ) )
       )
     )
