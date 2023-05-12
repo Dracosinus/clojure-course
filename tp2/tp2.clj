@@ -1,4 +1,4 @@
-(ns tp2)
+(ns tp2 )
 
 (require '[clj-time.core :as t])
 ;(t/date-time 1986)
@@ -58,7 +58,7 @@
 (defrecord Borrower [nom prenom addresse livres-empruntes])
 
 (defn create-borrower[nom prenom addresse]
-  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse [])))
+  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse {})))
 
 (create-borrower "Benoit" "Schuler" "FAR")
 
@@ -67,7 +67,7 @@
     (if (> (:exemplaires-disponibles target-book) 0) 
       (if-let [borrower (get @emprunts borrower-key)]
         (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- (:exemplaires-disponibles target-book) 1)))
-            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes borrower) isbn))))
+            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (assoc (:livres-empruntes borrower) isbn (t/now)))))
         (println "Borrower doesn't exist")
         )
       (println "Book not available")
@@ -76,13 +76,14 @@
   
 
 (borrow-book (hash (str "Benoit" "Schuler")) 1234)
+(borrow-book (hash (str "Benoit" "Schuler")) 2757851357)
 
 (defn return-book [borrower-key isbn]
   (if-let [target-book (get @bibliotheque isbn)] 
      (if-let [borrower (get @emprunts borrower-key)]
-       (if (some #{isbn} (:livres-empruntes (get @emprunts borrower-key))) 
+       (if (contains? (:livres-empruntes borrower) isbn) 
          (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (inc (:exemplaires-disponibles target-book))))
-             (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (remove  #{isbn} (:livres-empruntes (get @emprunts borrower-key)))))
+             (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (dissoc (:livres-empruntes borrower) isbn)))
              )
          (println "Book not borrowed")
          )
@@ -93,3 +94,4 @@
 (return-book (hash (str "Benoit" "Schuler")) 1234)
 bibliotheque
 emprunts
+
