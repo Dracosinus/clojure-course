@@ -16,14 +16,17 @@ date-de-publication isbn]
 date-de-publication isbn 1))
 )
 
-(def hp1 (create-book "harry potter a l'école des sorciers" "JK Rowling"
-             "Gallimard jeunesse" (t/date-time 1997 06 26) 2070584623))
-(def hp2 (create-book "harry potter a l'école des sorciers" "JK Rowling"
-                      "Gallimard jeunesse" (t/date-time 1997 07 02) 2070584624))
-(def cthulhu (create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" (t/date-time 1928 02) 2757851357))
+(create-book "harry potter a l'école des sorciers" "JK Rowling"
+             "Gallimard jeunesse" (t/date-time 1997 06 26) 2070584623)
+(create-book "harry potter a l'école des sorciers" "JK Rowling"
+             "Gallimard jeunesse" (t/date-time 1997 07 02) 2070584624)
+(create-book "L'appel de Cthulhu" "HP Lovecraft" "POINTS" (t/date-time 1928 02) 2757851357)
+(def hp1 (find @bibliotheque 2070584623))
+(def hp2 (find @bibliotheque 2070584624))
+(def cthulhu (find @bibliotheque 2757851357))
+
 
 (def test-book-list [hp1 cthulhu hp2])
-bibliotheque
 
 (defn list-books-by-author [books author]
   (filter #(= author (:auteur %)) books))
@@ -46,10 +49,18 @@ bibliotheque
   (swap! bibliotheque assoc isbn (assoc book :isbn isbn))
   )
 
-(get-book-isbn (set-book-isbn cthulhu 1234))
+;(get-book-isbn (set-book-isbn cthulhu 1234))
 
 (defn print-book [book]
-  (print book))
+  (let [{titre :titre auteur :auteur editeur :editeur date-de-publication :date-de-publication isbn :isbn exemplaires-disponibles :exemplaires-disponibles} book]
+    (print titre)
+    (print auteur)
+    (print editeur)
+    (print date-de-publication)
+    (print isbn)
+    (print exemplaires-disponibles)
+    )
+)
 
 (print-book cthulhu)
 
@@ -61,4 +72,15 @@ bibliotheque
 )
 
 (create-borrower "Benoit" "Schuler" "FAR")
+
+(defn borrow-book [borrower-key isbn]
+  (if-let [target-book (find @bibliotheque isbn)]
+    (if (> (:exemplaires-disponibles target-book) 0) 
+      (if-let [borrower (find @emprunts borrower-key)]
+        (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- exemplaires-disponibles 1)))
+            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj livres-empruntes target-book)))
+        ) )
+      )
+    )
+  )
 
