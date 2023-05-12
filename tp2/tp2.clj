@@ -58,7 +58,7 @@
 (defrecord Borrower [nom prenom addresse livres-empruntes])
 
 (defn create-borrower[nom prenom addresse]
-  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse {})))
+  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse [])))
 
 (create-borrower "Benoit" "Schuler" "FAR")
 
@@ -67,7 +67,12 @@
     (if (> (:exemplaires-disponibles target-book) 0) 
       (if-let [borrower (get @emprunts borrower-key)]
         (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- (:exemplaires-disponibles target-book) 1)))
-            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes target-book) target-book))))))))
+            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes borrower) isbn))))
+        (println "Borrower doesn't exist")
+        )
+      (println "Book not available")
+      )
+    (println "Book doesn't exist")))
   
 
 (borrow-book (hash (str "Benoit" "Schuler")) 1234)
@@ -75,23 +80,16 @@
 (defn return-book [borrower-key isbn]
   (if-let [target-book (get @bibliotheque isbn)] 
      (if-let [borrower (get @emprunts borrower-key)]
-       (if (some #{target-book} (:livres-empruntes (get @emprunts borrower-key))) 
-         (do (println "Right here")
-             (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (inc (:exemplaires-disponibles target-book))))
-             (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (remove  #{target-book} (:livres-empruntes (get @emprunts borrower-key)))))
+       (if (some #{isbn} (:livres-empruntes (get @emprunts borrower-key))) 
+         (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (inc (:exemplaires-disponibles target-book))))
+             (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (remove  #{isbn} (:livres-empruntes (get @emprunts borrower-key)))))
              )
-         (println "failed3")
+         (println "Book not borrowed")
          )
-       (println "failed2")
+       (println "Borrower doesn't exist")
        )
-    (println "failed 1")))
-         
-      
+    (println "Book doesn't exist")))
+
+(return-book (hash (str "Benoit" "Schuler")) 1234)
 bibliotheque
 emprunts
-(return-book (hash (str "Benoit" "Schuler")) 1234)
-(some #{(get @bibliotheque 1234)} (:livres-empruntes (get @emprunts (hash (str "Benoit" "Schuler")))))
-(type (:livres-empruntes (get @emprunts (hash (str "Benoit" "Schuler")))))
-(get @bibliotheque 1234)
-(type (get @bibliotheque 1234))
-(some #{5} [5])
