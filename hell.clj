@@ -85,3 +85,5 @@
 (conj '(1 2 3) nil)
 (reverse '(1 2 3))
 (reverse (conj (reverse '(1 2 3)) 4))
+(remove #{3 5} [1 2 3 4 5 6 7 8 9])
+(remove #{3} ["a" "b" "c" "d" 3])

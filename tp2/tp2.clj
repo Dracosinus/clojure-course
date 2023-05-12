@@ -6,15 +6,13 @@
 (def bibliotheque (atom {}))
 (def emprunts (atom {}))
 
-;1
 (defrecord Book [titre auteur editeur
-date-de-publication isbn exemplaires-disponibles])
+                 date-de-publication isbn exemplaires-disponibles])
 
 (defn create-book [titre auteur editeur
-date-de-publication isbn]
+                   date-de-publication isbn]
   (swap! bibliotheque assoc isbn (->Book titre auteur editeur
-date-de-publication isbn 1))
-)
+                                  date-de-publication isbn 1)))
 
 (create-book "harry potter a l'école des sorciers" "JK Rowling"
              "Gallimard jeunesse" (t/date-time 1997 06 26) 2070584623)
@@ -29,8 +27,7 @@ date-de-publication isbn 1))
 (list-books-by-author "JK Rowling")
 
 (defn sort-books-by-date []
-  (sort-by :date-de-publication (vals @bibliotheque))
-)
+  (sort-by :date-de-publication (vals @bibliotheque)))
 
 (sort-books-by-date)
 
@@ -42,8 +39,8 @@ date-de-publication isbn 1))
 
 (defn set-book-isbn [book isbn] 
   (swap! bibliotheque dissoc (:isbn book))
-  (swap! bibliotheque assoc isbn (assoc book :isbn isbn))
-  )
+  (swap! bibliotheque assoc isbn (assoc book :isbn isbn)))
+  
 
 (get-book-isbn (set-book-isbn (get @bibliotheque 2070584623) 1234))
 
@@ -54,17 +51,14 @@ date-de-publication isbn 1))
     (println (str "Editor is  " editeur))
     (println (str "Printed on " (str (str "Year " (t/year date-de-publication)) (str (str ", Month "(t/month date-de-publication)) (str ", Day "  (t/day date-de-publication))))))
     (println (str "With ISBN  " isbn))
-    (println (str "Availables " exemplaires-disponibles))
-    )
-)
+    (println (str "Availables " exemplaires-disponibles))))
 
 (print-book (get @bibliotheque 1234))
 
 (defrecord Borrower [nom prenom addresse livres-empruntes])
 
 (defn create-borrower[nom prenom addresse]
-  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse []))
-)
+  (swap! emprunts assoc (hash (str nom prenom)) (->Borrower nom prenom addresse {})))
 
 (create-borrower "Benoit" "Schuler" "FAR")
 
@@ -73,12 +67,31 @@ date-de-publication isbn 1))
     (if (> (:exemplaires-disponibles target-book) 0) 
       (if-let [borrower (get @emprunts borrower-key)]
         (do (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (- (:exemplaires-disponibles target-book) 1)))
-            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes target-book) target-book)))
-        ) )
-      )
-    )
-  )
+            (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (conj (:livres-empruntes target-book) target-book))))))))
+  
 
 (borrow-book (hash (str "Benoit" "Schuler")) 1234)
-emprunts
+
+(defn return-book [borrower-key isbn]
+  (if-let [target-book (get @bibliotheque isbn)] 
+     (if-let [borrower (get @emprunts borrower-key)]
+       (if (some #{target-book} (:livres-empruntes (get @emprunts borrower-key))) 
+         (do (println "Right here")
+             (swap! bibliotheque assoc isbn (assoc target-book :exemplaires-disponibles (inc (:exemplaires-disponibles target-book))))
+             (swap! emprunts assoc borrower-key (assoc borrower :livres-empruntes (remove  #{target-book} (:livres-empruntes (get @emprunts borrower-key)))))
+             )
+         (println "failed3")
+         )
+       (println "failed2")
+       )
+    (println "failed 1")))
+         
+      
 bibliotheque
+emprunts
+(return-book (hash (str "Benoit" "Schuler")) 1234)
+(some #{(get @bibliotheque 1234)} (:livres-empruntes (get @emprunts (hash (str "Benoit" "Schuler")))))
+(type (:livres-empruntes (get @emprunts (hash (str "Benoit" "Schuler")))))
+(get @bibliotheque 1234)
+(type (get @bibliotheque 1234))
+(some #{5} [5])
